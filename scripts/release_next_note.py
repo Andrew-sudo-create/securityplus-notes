@@ -7,14 +7,17 @@ import sys
 from pathlib import Path
 
 
+IGNORED_NAMES = {".gitkeep", ".DS_Store"}
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Move one hidden note set into the public notes folder."
+        description="Move one hidden note file into the public notes folder."
     )
     parser.add_argument(
         "--hidden-dir",
         default=".hidden-notes",
-        help="Directory that contains unreleased note sets.",
+        help="Directory that contains unreleased note files/folders.",
     )
     parser.add_argument(
         "--public-dir",
@@ -22,6 +25,30 @@ def parse_args() -> argparse.Namespace:
         help="Directory where released note sets are published.",
     )
     return parser.parse_args()
+
+
+def iter_note_files(hidden_dir: Path) -> list[Path]:
+    candidates: list[Path] = []
+    for path in hidden_dir.rglob("*"):
+        if not path.is_file():
+            continue
+        if path.name in IGNORED_NAMES:
+            continue
+        candidates.append(path)
+
+    return sorted(
+        candidates,
+        key=lambda p: str(p.relative_to(hidden_dir)).lower(),
+    )
+
+
+def remove_empty_parents(path: Path, stop_dir: Path) -> None:
+    current = path.parent
+    while current != stop_dir and current.exists():
+        if any(current.iterdir()):
+            break
+        current.rmdir()
+        current = current.parent
 
 
 def main() -> int:
@@ -35,17 +62,15 @@ def main() -> int:
 
     public_dir.mkdir(parents=True, exist_ok=True)
 
-    entries = sorted(
-        [path for path in hidden_dir.iterdir() if path.name not in {".gitkeep"}],
-        key=lambda p: p.name.lower(),
-    )
+    entries = iter_note_files(hidden_dir)
 
     if not entries:
-        print("No hidden note sets available to release.")
+        print("No hidden notes available to release.")
         return 0
 
     next_entry = entries[0]
-    target = public_dir / next_entry.name
+    relative_path = next_entry.relative_to(hidden_dir)
+    target = public_dir / relative_path
 
     if target.exists():
         print(
@@ -54,8 +79,10 @@ def main() -> int:
         )
         return 1
 
+    target.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(next_entry), str(target))
-    print(f"Released note set: {next_entry} -> {target}")
+    remove_empty_parents(next_entry, hidden_dir)
+    print(f"Released note: {next_entry} -> {target}")
     return 0
 
 
