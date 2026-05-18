@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import sys
 from pathlib import Path
 
 
 IGNORED_NAMES = {".gitkeep", ".DS_Store"}
+IGNORED_TOP_LEVEL_DIRS = {"downloadables"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -34,11 +36,21 @@ def iter_note_files(hidden_dir: Path) -> list[Path]:
             continue
         if path.name in IGNORED_NAMES:
             continue
+        relative = path.relative_to(hidden_dir)
+        if relative.parts and relative.parts[0].lower() in IGNORED_TOP_LEVEL_DIRS:
+            continue
         candidates.append(path)
+
+    def sort_key(path: Path) -> tuple[int, int, str]:
+        relative = path.relative_to(hidden_dir)
+        match = re.match(r"^(\d+)", path.name)
+        if match:
+            return (0, int(match.group(1)), str(relative).lower())
+        return (1, 0, str(relative).lower())
 
     return sorted(
         candidates,
-        key=lambda p: str(p.relative_to(hidden_dir)).lower(),
+        key=sort_key,
     )
 
 
