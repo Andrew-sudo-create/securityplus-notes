@@ -1,0 +1,25 @@
+This lecture covers the fundamentals of security, emphasizing the balance between security and usability that cybersecurity professionals face. Here are the main points:
+
+Threats to Network Security: It discusses both internal and external threats and how user convenience often compromises security, creating vulnerabilities.
+
+Key Terms:
+
+Information Security: Protects data from unauthorized access and modification.
+Information System Security: Safeguards the systems that process this data.
+C.I.A Triad: The foundational pillars of security:
+
+Confidentiality: Ensures only authorized access to sensitive information.
+Integrity: Guarantees data accuracy and prevents alteration.
+Availability: Ensures resources are accessible when needed.
+Non-repudiation: Ensures that actions cannot be denied by involved parties.
+
+C.I.A.N.A Model: Expands the triad to include:
+
+Authentication: Verifies user identities.
+Authorization: Determines user permissions.
+Accounting: Tracks user activities for auditing.
+Security Controls: Discusses various categories, including:
+
+Technical, Managerial, Operational, and Physical Controls.
+Measures can be Preventative, Detective, or Corrective.
+Zero Trust Model: Advocates for verification of all access attempts rather than default trust.
