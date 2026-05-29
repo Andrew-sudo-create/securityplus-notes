@@ -43,3 +43,5 @@ This creates a clean timeline of learning progress and keeps the public notes ar
 
 `.hidden-notes` is hidden by naming convention only.  
 If this repository is public, unreleased notes in that folder are still visible.
+
+Coding makes me tired
